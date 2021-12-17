@@ -2,20 +2,13 @@ import os, random
 import requests
 from moviepy.audio import *
 from moviepy.editor import *
-from keys import key, secret, bearer
+from keys import consumer_key, consumer_secret, access_token, access_token_secret
 from internetarchive import *
 import urllib.parse
 import json
 import time
 from tinytag import TinyTag
 import tweepy
-
-
-auth = tweepy.OAuthHandler(consumer_key=key, consumer_secret=secret)
-birdapp = tweepy.API(auth)
-
-
-
 
 finallength = random.randrange(5, 15)
 
@@ -71,28 +64,17 @@ audio = audio.subclip(randompoint_audio, randompoint_audio + finallength)
 
 new_audioclip = CompositeAudioClip([audio])
 video.audio = new_audioclip
-video.write_videofile("export.mp4")
+# video.write_videofile("export.mp4")
+video.write_videofile("export.mp4", temp_audiofile='temp-audio.m4a', remove_temp=True, codec="libx264", audio_codec="aac")
 
 time.sleep(10)
 print("waiting again for file...")
-uploadedmedia = birdapp.media_upload(filename="export.mp4")
+auth = tweepy.OAuthHandler(consumer_key=consumer_key, consumer_secret=consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
+api = tweepy.API(auth=auth)
+
+upload = api.media_upload("export.mp4")
+videotweet = api.update_status(status="", media_ids=[upload.media_id_string])
+
 statustext = audio_attribution + "\n" + video_attribution
-videotweet = birdapp.update_status(media_ids=uploadedmedia["id"])
-replytweet = birdapp.update_status(status=statustext, in_reply_to_status_id=videotweet["id"])
-
-#######################################################################
-# choose random audio file from directory ✓
-# scrape artist/title, if doesn't exist just use filename
-# choose 10 second clip, making sure not to go over end bound ✓
-
-# choose a random silent film https://archive.org/details/silent_films ✓
-# might need to get/generate a CSV and randomize from there ✓
-# scrape film title and director or producer ✓
-# download a random 10 second clip, use internet archive API or CLI ✓
-
-# use moviepy to combine and save ✓
-
-# tweet with tweepy
-# immediately relpy to tweet with attribution
-
-# delete generated and downloaded media
+replytweet = api.update_status(status=statustext, in_reply_to_status_id=videotweet.id_str)

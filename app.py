@@ -64,7 +64,7 @@ audio = audio.subclip(randompoint_audio, randompoint_audio + finallength)
 
 new_audioclip = CompositeAudioClip([audio])
 video.audio = new_audioclip
-# video.write_videofile("export.mp4")
+
 video.write_videofile("export.mp4", temp_audiofile='temp-audio.m4a', remove_temp=True, codec="libx264", audio_codec="aac")
 
 time.sleep(10)

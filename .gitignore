@@ -1,6 +1,6 @@
 keys.py
 music/
-_pycache_
+__pycache__/
 cool/
 venv/
 export.mp4

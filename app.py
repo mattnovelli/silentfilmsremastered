@@ -45,11 +45,11 @@ time.sleep(5)
 
 video = VideoFileClip("raw.mp4", audio=False)
 
-filename = random.choice(os.listdir("music/"))
+filename = random.choice(os.listdir("/media/external/silentfilmsremastered/music"))
 print(f"music: music/{filename}")
 
-audio_data = TinyTag.get(f"music/{filename}")
-audio = AudioFileClip(f"music/{filename}")
+audio_data = TinyTag.get(f"/media/external/silentfilmsremastered/music/{filename}")
+audio = AudioFileClip(f"/media/external/silentfilmsremastered/music/{filename}")
 
 audio_attribution = "🎵: "
 if audio_data.title is not None and audio_data.artist is not None:
@@ -73,8 +73,11 @@ auth = tweepy.OAuthHandler(consumer_key=consumer_key, consumer_secret=consumer_s
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth=auth)
 
+
+client = tweepy.Client(access_token=access_token, consumer_key=consumer_key, consumer_secret=consumer_secret, access_token_secret=access_token_secret)
+
 upload = api.media_upload("export.mp4")
-videotweet = api.update_status(status="", media_ids=[upload.media_id_string])
+videotweet = client.create_tweet(text="", media_ids=[upload.media_id_string])
 
 statustext = audio_attribution + "\n" + video_attribution
-replytweet = api.update_status(status=statustext, in_reply_to_status_id=videotweet.id_str)
+replytweet = client.create_tweet(text=statustext, in_reply_to_tweet_id=videotweet.data['id'])
